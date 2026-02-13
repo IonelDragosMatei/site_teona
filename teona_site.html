@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Ask4CNI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD_RqQO9gdePTHVBxjggzpDgg8-PIIngkQ",
+      authDomain: "ask4cni.firebaseapp.com",
+      projectId: "ask4cni",
+      storageBucket: "ask4cni.firebasestorage.app",
+      messagingSenderId: "12380003572",
+      appId: "1:12380003572:web:d4f3571b36b761576ad2a1",
+      measurementId: "G-C59FD9ZCMV"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+</head>
+<body>
+
+<header>
+  <h1>Ask4CNI</h1>
+  <div id="loginBox">
+    <span>Nume (prof):</span>
+    <input type="text" id="loginName" placeholder="Profesor doar">
+    <span>PIN:</span>
+    <input type="password" id="loginPin" placeholder="">
+    <button id="loginBtn">Login</button>
+    <button id="logoutBtn" style="display:none;">Logout</button>
+    <span id="loginInfo"></span>
+  </div>
+</header>
+
+<main>
+  <section id="left">
+    <div class="card">
+      <h2>Pune o întrebare</h2>
+      <p class="note">
+      </p>
+      <form id="questionForm">
+        <label for="qTitle">Titlu</label>
+        <input type="text" id="qTitle">
+
+        <label for="qSubject">Materia</label>
+        <select id="qSubject">
+          <option value="">Alege materia</option>
+          <option>Matematică</option>
+          <option>Informatică</option>
+          <option>TIC</option>
+          <option>Română</option>
+          <option>Engleză</option>
+          <option>Germană</option>
+          <option>Franceză</option>
+          <option>Fizică</option>
+          <option>Chimie</option>
+          <option>Biologie</option>
+          <option>Istorie</option>
+          <option>Istoria evreilor</option>
+          <option>Istoria comunismului</option>
+          <option>Geografie</option>
+          <option>Logică</option>
+          <option>Filosofie</option>
+          <option>Economie</option>
+          <option>Antreprenorială</option>
+          <option>Religie</option>
+          <option>Sport</option>
+          <option>Altă materie</option>
+          <option>Întrebări și probleme legate de școală</option>
+        </select>
+
+        <label for="qBody">Întrebarea</label>
+        <textarea id="qBody"></textarea>
+
+        <button type="submit">Trimite întrebarea</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>Întrebări</h2>
+      <ul id="questionsList"></ul>
+    </div>
+  </section>
+
+  <section id="right">
+    <div class="card">
+      <h2>Detalii întrebare</h2>
+      <div id="questionDetail">
+        <p>Alege o întrebare din stânga.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Răspunsuri</h2>
+      <div id="answersList"></div>
+
+      <h3>Adaugă un răspuns</h3>
+      <p class="note">Trebuie să fii logat.</p>
+      <form id="answerForm">
+        <label for="aBody">Răspuns</label>
+        <textarea id="aBody"></textarea>
+        <button type="submit">Trimite răspunsul</button>
+      </form>
+    </div>
+  </section>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
