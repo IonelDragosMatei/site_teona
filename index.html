@@ -3,53 +3,990 @@
   <meta charset="UTF-8">
   <title>Ask4CNI</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    body {
+      background: #0A1428;
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      color: white;
+    }
+
+    html, body {
+    overflow: hidden;
+    height: 100%;
+    }
+
+    ::-webkit-scrollbar {
+        width: 9px;
+        height: 9px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #1a1a1a;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(
+            180deg,
+            #4A7B9A
+        );
+        border-radius: 20px;
+        border: 2px solid #1a1a1a;
+        min-height: 30px;
+        max-height: 60px;
+    }
+
+    .intro-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0A1428;
+      z-index: 10000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .intro-overlay.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .intro-content {
+      text-align: center;
+      position: relative;
+      width: 100%;
+      max-width: 800px;
+      padding: 20px;
+    }
+
+    .intro-logo {
+      font-size: 80px;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+      animation: glitch 2.5s infinite;
+      position: relative;
+    }
+
+    .intro-logo::before,
+    .intro-logo::after {
+      content: "Ask4CNI";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.8;
+    }
+
+    .intro-logo::before {
+      color: #4A7B9A;
+      z-index: -1;
+      animation: glitch-left 1.5s infinite;
+    }
+
+    .intro-logo::after {
+      color: #FF7F4F;
+      z-index: -2;
+      animation: glitch-right 1.8s infinite;
+    }
+
+    @keyframes glitch {
+      0%, 100% { transform: translate(0); }
+      20% { transform: translate(-3px, 2px); }
+      40% { transform: translate(3px, -2px); }
+      60% { transform: translate(-2px, 1px); }
+      80% { transform: translate(2px, -1px); }
+    }
+
+    @keyframes glitch-left {
+      0%, 100% { transform: translate(0); opacity: 0.5; }
+      25% { transform: translate(-8px, 3px); opacity: 0.8; }
+      50% { transform: translate(5px, -3px); opacity: 0.3; }
+      75% { transform: translate(-5px, 2px); opacity: 0.6; }
+    }
+
+    @keyframes glitch-right {
+      0%, 100% { transform: translate(0); opacity: 0.5; }
+      25% { transform: translate(8px, -3px); opacity: 0.3; }
+      50% { transform: translate(-5px, 3px); opacity: 0.8; }
+      75% { transform: translate(5px, -2px); opacity: 0.6; }
+    }
+
+    .intro-tag {
+      font-size: 36px;
+      color: #4A7B9A;
+      font-family: 'Courier New', monospace;
+      margin-bottom: 50px;
+      opacity: 0;
+      animation: fadeInScale 1s ease forwards 0.7s;
+      position: relative;
+      overflow: hidden;
+      display: inline-block;
+      padding: 0 20px;
+    }
+
+    .intro-tag::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+      animation: shimmer 2.5s infinite 1.2s;
+    }
+
+    .intro-loader-container {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-top: 60px;
+      perspective: 500px;
+    }
+
+    .intro-loader-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #4A7B9A;
+      animation: bounceRotate 1.8s ease infinite;
+      transform-style: preserve-3d;
+    }
+
+    .intro-loader-circle:nth-child(2) {
+      background: #FFFFFF;
+      animation-delay: 0.3s;
+    }
+
+    .intro-loader-circle:nth-child(3) {
+      background: #FF7F4F;
+      animation-delay: 0.6s;
+    }
+
+    .intro-loader-circle:nth-child(4) {
+      background: #4A7B9A;
+      animation-delay: 0.9s;
+    }
+
+    .intro-loader-circle:nth-child(5) {
+      background: #FFFFFF;
+      animation-delay: 1.2s;
+    }
+
+    @keyframes bounceRotate {
+      0%, 100% { 
+        transform: translateY(0) rotateX(0deg); 
+        opacity: 1;
+      }
+      25% { 
+        transform: translateY(-40px) rotateX(180deg); 
+        opacity: 0.8;
+      }
+      50% { 
+        transform: translateY(0) rotateX(360deg); 
+        opacity: 1;
+      }
+      75% { 
+        transform: translateY(-20px) rotateX(180deg); 
+        opacity: 0.9;
+      }
+    }
+
+    .intro-progress-bar {
+      width: 300px;
+      height: 4px;
+      background: rgba(74, 123, 154, 0.3);
+      border-radius: 2px;
+      margin: 50px auto 0;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .intro-progress-bar::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, #4A7B9A, #FF7F4F, #FFFFFF);
+      animation: progressLoad 2.5s ease forwards;
+    }
+
+    @keyframes progressLoad {
+      0% { left: -100%; }
+      100% { left: 100%; }
+    }
+
+    @keyframes fadeInScale {
+      from {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes shimmer {
+      0% { left: -100%; }
+      50% { left: 100%; }
+      100% { left: 100%; }
+    }
+
+    .reload-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #0A1428;
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .reload-animation.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .reload-content {
+      text-align: center;
+    }
+
+    .reload-cubes {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .reload-cube {
+      width: 25px;
+      height: 25px;
+      background: #4A7B9A;
+      animation: cubeWave 1.2s ease infinite;
+    }
+
+    .reload-cube:nth-child(2) {
+      background: #FFFFFF;
+      animation-delay: 0.2s;
+    }
+
+    .reload-cube:nth-child(3) {
+      background: #FF7F4F;
+      animation-delay: 0.4s;
+    }
+
+    .reload-cube:nth-child(4) {
+      background: #4A7B9A;
+      animation-delay: 0.6s;
+    }
+
+    @keyframes cubeWave {
+      0%, 100% { transform: scale(1) rotate(0deg); }
+      50% { transform: scale(1.3) rotate(90deg); }
+    }
+
+    .reload-text {
+      color: #FFFFFF;
+      font-size: 20px;
+      font-family: 'Courier New', monospace;
+      opacity: 0.8;
+      letter-spacing: 2px;
+    }
+
+    .bg-grid {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(rgba(74, 123, 154, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(74, 123, 154, 0.05) 1px, transparent 1px);
+      background-size: 50px 50px;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    header {
+      position: relative;
+      z-index: 100;
+      padding: 20px 50px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 20, 40, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .header-left {
+      display: flex;
+      align-items: baseline;
+      gap: 20px;
+    }
+
+    .logo {
+      font-size: 40px;
+      font-weight: 800;
+      color: #FFFFFF;
+      margin-bottom: 20px;
+      letter-spacing: -1px;
+      text-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+      animation: glitch 2.5s infinite;
+      position: relative;
+    }
+
+    .logo::before,
+    .logo::after {
+      content: "Ask4CNI";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.8;
+    }
+
+    .logo::before {
+      color: #4A7B9A;
+      z-index: -1;
+      animation: glitch-left 1.5s infinite;
+    }
+
+    .logo::after {
+      color: #FF7F4F;
+      z-index: -2;
+      animation: glitch-right 1.8s infinite;
+    }
+
+    .cpp-tag {
+      font-size: 25px;
+      color: #4A7B9A;
+      font-family: 'Courier New', monospace;
+    }
+
+    .hero-section {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 0 80px;
+        margin-top: 80px;
+      }
+
+      .campus-text {
+        font-size: 40px;
+        color: #4A7B9A;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+      }
+
+      .campus-text.left {
+        transform: rotate(180deg);
+      }
+
+      .campus-text.right {
+        transform: none; 
+      }
+
+    .join-block {
+      margin-top: 20px;
+    }
+
+    .join-block .join-btn {
+      background: transparent;
+      color: white;
+      border: 2px solid #FF7F4F;
+      padding: 15px 40px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .join-block .join-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .join-block .join-btn:hover {
+      background: #FF7F4F;
+      border-color: #FF7F4F;
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(255, 127, 79, 0.3);
+    }
+
+    .join-block .join-btn:hover::before {
+      left: 100%;
+    }
+
+    .campus-text {
+      font-size: 30px;
+      color: #4A7B9A;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      writing-mode: vertical-rl;
+      transform: rotate(180deg);
+    }
+
+    .features-grid {
+      position: relative;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      max-width: 1200px;
+      margin: 40px auto 60px;
+      padding: 0 50px;
+      text-align: center;
+      text-justify: inter-word;
+    }
+
+    .feature-card {
+      background: rgba(20, 35, 55, 0.7);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 30px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+      transition: left 0.5s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255, 127, 79, 0.3);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .feature-card:hover::before {
+      left: 100%;
+    }
+
+    .feature-card h3 {
+      font-size: 24px;
+      font-weight: 600;
+      color: white;
+      margin-bottom: 20px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .feature-card h3::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 40px;
+      height: 3px;
+      background: #FF7F4F;
+    }
+
+    .feature-card p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .about-section {
+      position: relative;
+      z-index: 10;
+      max-width: 1200px;
+      margin: 0 auto 60px;
+      padding: 0 50px;
+    }
+
+    .about-title {
+      font-size: 36px;
+      font-weight: 600;
+      color: white;
+      margin-bottom: 20px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .about-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 0;
+      width: 80px;
+      height: 4px;
+      background: #FF7F4F;
+    }
+
+    .campus-section {
+      position: relative;
+      z-index: 10;
+      max-width: 1200px;
+      margin: 0 auto 80px;
+      padding: 0 50px;
+      text-align: center;
+    }
+
+    .campus-title {
+      font-size: 32px;
+      font-weight: 600;
+      color: #4A7B9A;
+      text-transform: uppercase;
+      letter-spacing: 4px;
+    }
+
+    .header-login {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      background: rgba(20, 35, 55, 0.6);
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: 1px solid rgba(74, 123, 154, 0.3);
+    }
+    
+    #loginInfo {
+      flex: 1;
+      text-align: center;
+    }
+
+    .header-login span {
+      color: #9AAEC2;
+      font-weight: 500;
+      font-size: 13px;
+    }
+
+    .header-login input {
+      font-size: 13px;
+      padding: 6px 12px;
+      border: 1px solid #1E2A3A;
+      border-radius: 4px;
+      background: #0F1A2A;
+      color: white;
+      width: 100px;
+      transition: all 0.3s;
+    }
+
+    .header-login input:focus {
+      outline: none;
+      border-color: #4A7B9A;
+      background: #1A2535;
+      box-shadow: 0 0 10px rgba(74, 123, 154, 0.2);
+    }
+
+    .header-login button {
+      font-size: 12px;
+      padding: 6px 16px;
+      border-radius: 4px;
+      border: none;
+      background: #4A7B9A;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 500;
+    }
+
+    .header-login button:hover {
+      background: #5A8BAA;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(74, 123, 154, 0.3);
+    }
+
+    #logoutBtn {
+      background: #2A3A50;
+    }
+
+    #loginInfo {
+      font-size: 11px;
+      color: #9AAEC2;
+      margin-left: 5px;
+    }
+
+    .main-content {
+      max-width: 1200px;
+      margin: 40px auto 60px;
+      padding: 0 20px;
+      display: flex;
+      gap: 25px;
+      position: relative;
+      z-index: 20;
+    }
+
+    #left, #right {
+      flex: 1;
+    }
+
+    .card {
+      background: rgba(20, 35, 55, 0.9);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 22px 25px;
+      margin-bottom: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+      border-color: rgba(74, 123, 154, 0.3);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      font-size: 25px;
+      color: white;
+      border-bottom: 2px solid #FF7F4F;
+      padding-bottom: 10px;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+
+    .card h3 {
+      margin-top: 20px;
+      font-size: 16px;
+      color: #9AAEC2;
+      font-weight: 600;
+    }
+
+    .note {
+      font-size: 12px;
+      color: #6A7F99;
+      margin-top: -10px;
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      margin-top: 15px;
+      margin-bottom: 5px;
+      font-weight: 500;
+      color: #9AAEC2;
+    }
+
+    input[type="text"],
+    select,
+    textarea {
+      width: 100%;
+      font-size: 13px;
+      padding: 10px 12px;
+      border: 1px solid #1E2A3A;
+      border-radius: 6px;
+      background: #0F1A2A;
+      color: white;
+      transition: all 0.3s;
+    }
+
+    input[type="text"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #4A7B9A;
+      background: #1A2535;
+      box-shadow: 0 0 15px rgba(74, 123, 154, 0.2);
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 22px;
+      font-size: 13px;
+      border-radius: 6px;
+      border: none;
+      background: #FF7F4F;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    button:hover {
+      background: #FF8F5F;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(255, 127, 79, 0.3);
+    }
+
+    #questionsList {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    #questionsList li {
+      border: 1px solid #1E2A3A;
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      background: #0F1A2A;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      color: #E0E5EC;
+      transition: all 0.3s;
+    }
+
+    #questionsList li:hover {
+      background: #1A2535;
+      border-color: #4A7B9A;
+      transform: translateX(5px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    #questionsList li span.materia {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: #4A7B9A;
+      color: white;
+      font-weight: 500;
+    }
+
+    .answer {
+      border: 1px solid #1E2A3A;
+      padding: 15px;
+      margin-bottom: 12px;
+      font-size: 14px;
+      background: #0F1A2A;
+      border-radius: 6px;
+      color: #E0E5EC;
+    }
+
+    .answer .meta {
+      font-size: 12px;
+      color: #6A7F99;
+      margin-top: 8px;
+    }
+
+    .teacherComment {
+      font-size: 12px;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #1A2535;
+      border-radius: 4px;
+      border-left: 3px solid #FF7F4F;
+      color: #9AAEC2;
+    }
+
+    @media (max-width: 1000px) {
+      .hero-section {
+        flex-direction: column;
+        gap: 30px;
+      }
+
+      .campus-text {
+        writing-mode: horizontal-tb;
+        transform: none;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+        padding: 0 20px;
+      }
+      
+      .intro-logo {
+        font-size: 50px;
+      }
+      
+      .intro-tag {
+        font-size: 24px;
+      }
+    }
+
+    @media (max-width: 800px) {
+      header {
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+      }
+      
+      .header-login {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .main-content {
+        flex-direction: column;
+      }
+    }
+
+    label {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-soft);
+    }
+
+    label {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-soft);
+    }
+
+    label[for="aBody"] {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: 0.5px;
+    }
+
+    .campus-quote {
+      position: relative;
+      z-index: 10;
+      max-width: 1200px;
+      margin: 30px auto 60px;
+      padding: 0 50px;
+      text-align: center;
+      font-size: 28px;
+      color: #FFFFFF;
+      font-style: italic;
+      border-top: 1px solid rgba(74,123,154,0.3);
+      border-bottom: 1px solid rgba(255,127,79,0.3);
+      padding: 30px 0;
+    }
+
+    .campus-quote span {
+      color: #fc8458;
+      font-weight: 600;
+    }
+  </style>
+  
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyD_RqQO9gdePTHVBxjggzpDgg8-PIIngkQ",
-      authDomain: "ask4cni.firebaseapp.com",
-      projectId: "ask4cni",
-      storageBucket: "ask4cni.firebasestorage.app",
-      messagingSenderId: "12380003572",
-      appId: "1:12380003572:web:d4f3571b36b761576ad2a1",
-      measurementId: "G-C59FD9ZCMV"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-  </script>
 </head>
 <body>
 
+<div class="intro-overlay" id="introOverlay">
+  <div class="intro-content">
+    <div class="intro-logo">Ask4CNI</div>
+    <div class="intro-tag">#include &lt;community&gt;</div>
+    <div class="intro-progress-bar"></div>
+  </div>
+</div>
+
+<div class="reload-animation" id="reloadAnimation">
+  <div class="reload-content">
+    <div class="reload-cubes">
+      <div class="reload-cube"></div>
+      <div class="reload-cube"></div>
+      <div class="reload-cube"></div>
+      <div class="reload-cube"></div>
+    </div>
+    <div class="reload-text">#include &lt;community&gt;</div>
+  </div>
+</div>
+
+<div class="bg-grid"></div>
+
 <header>
-  <h1>Ask4CNI</h1>
-  <div id="loginBox">
-    <span>Nume (prof):</span>
-    <input type="text" id="loginName" placeholder="Profesor doar">
-    <span>PIN:</span>
-    <input type="password" id="loginPin" placeholder="">
-    <button id="loginBtn">Login</button>
+  <div class="header-left">
+    <div class="logo">Ask4CNI</div>
+    <div class="cpp-tag">#include &lt;community&gt;</div>
+  </div>
+  
+  <div id="loginBox" class="header-login">
+    <span><strong>Nume:</strong></span>
+    <input type="text" id="loginName" placeholder="User">
+    <span><strong>PIN:</strong></span>
+    <input type="password" id="loginPin" placeholder="PIN">
+    <button id="loginBtn"><strong>LOGIN</strong></button>
     <button id="logoutBtn" style="display:none;">Logout</button>
     <span id="loginInfo"></span>
   </div>
 </header>
 
-<main>
+<div class="hero-section">
+  <div class="campus-text left"><strong>CNI CAMPUS</strong></div>
+  <div class="campus-text right"><strong>CNI CAMPUS</strong></div>
+</div>
+
+<div class="features-grid">
+  <div class="feature-card">
+    <h3><strong>Learning at CNI</strong></h3>
+    <p><strong>CNI is specialized in STEM subjects, emphasising mathematics and computer science.</strong></p>
+  </div>
+  <div class="feature-card">
+    <h3><strong>Students for students</strong></h3>
+    <p><strong>Our students are delighted with the opportunities and activities available through their colleagues' initiatives.</strong></p>
+  </div>
+  <div class="feature-card">
+    <h3><strong>In our leisure time</strong></h3>
+    <p><strong>In between classes, we enjoy socializing on the beautiful school complex with our peers.</strong></p>
+  </div>
+</div>
+
+<div class="about-section">
+  <h2 class="about-title"><strong>About Us</strong></h2>
+  <p style="color:rgba(255,255,255,0.7); font-size: 18px; max-width: 800px;"><strong><em>beginning</em> – "teamwork, friendships, and community are what truly define the experience."</strong></p>
+</div>
+
+<div class="campus-quote">
+  <strong><span>#include &lt;friends&gt;</span> — forever CNI</strong>
+</div>
+
+<div class="main-content">
   <section id="left">
     <div class="card">
-      <h2>Pune o întrebare</h2>
-      <p class="note">
-      </p>
+      <h2><strong>Ask a question</strong></h2>
       <form id="questionForm">
-        <label for="qTitle">Titlu</label>
-        <input type="text" id="qTitle">
-
-        <label for="qSubject">Materia</label>
+        <label for="qTitle"><strong>Title</strong></label>
+        <input type="text" id="qTitle" placeholder="The title of the question...">
+        <label for="qSubject"><strong>Subject</strong></label>
         <select id="qSubject">
-          <option value="">Alege materia</option>
+          <option value=""><strong>Choose the subject</strong></option>
           <option>Matematică</option>
           <option>Informatică</option>
           <option>TIC</option>
@@ -61,55 +998,556 @@
           <option>Chimie</option>
           <option>Biologie</option>
           <option>Istorie</option>
-          <option>Istoria evreilor</option>
-          <option>Istoria comunismului</option>
           <option>Geografie</option>
-          <option>Logică</option>
-          <option>Filosofie</option>
-          <option>Economie</option>
-          <option>Antreprenorială</option>
-          <option>Religie</option>
-          <option>Sport</option>
-          <option>Altă materie</option>
-          <option>Întrebări și probleme legate de școală</option>
         </select>
 
-        <label for="qBody">Întrebarea</label>
-        <textarea id="qBody"></textarea>
+        <label for="qBody"><strong>Question</strong></label>
+        <textarea id="qBody" placeholder="Scrie întrebarea ta..."></textarea>
 
-        <button type="submit">Trimite întrebarea</button>
+        <button type="submit"><strong>Trimite întrebarea</strong></button>
       </form>
     </div>
 
     <div class="card">
-      <h2>Întrebări</h2>
-      <ul id="questionsList"></ul>
+      <h2><strong>Questions</strong></h2>
+      <ul id="questionsList">
+        <li><strong>Nu există întrebări încă.</strong></li>
+      </ul>
     </div>
   </section>
 
   <section id="right">
     <div class="card">
-      <h2>Detalii întrebare</h2>
+      <h2><strong>Question details</strong></h2>
       <div id="questionDetail">
-        <p>Alege o întrebare din stânga.</p>
+        <p>Choose a question on the left.</p>
       </div>
     </div>
 
     <div class="card">
-      <h2>Răspunsuri</h2>
-      <div id="answersList"></div>
+      <h2><strong>Answers</strong></h2>
+      <div id="answersList">
+        <p>There are no answers yet.</p>
+      </div>
 
-      <h3>Adaugă un răspuns</h3>
-      <p class="note">Trebuie să fii logat.</p>
       <form id="answerForm">
-        <label for="aBody">Răspuns</label>
-        <textarea id="aBody"></textarea>
-        <button type="submit">Trimite răspunsul</button>
+        <label for="aBody"><strong>Răspuns</strong></label>
+        <textarea id="aBody" placeholder="Scrie răspunsul tău..."></textarea>
+        <button type="submit"><strong>Trimite răspunsul</strong></button>
       </form>
     </div>
   </section>
-</main>
+</div>
 
-<script src="script.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyD_RqQO9gdePTHVBxjggzpDgg8-PIIngkQ",
+    authDomain: "ask4cni.firebaseapp.com",
+    projectId: "ask4cni",
+    storageBucket: "ask4cni.firebasestorage.app",
+    messagingSenderId: "12380003572",
+    appId: "1:12380003572:web:d4f3571b36b761576ad2a1",
+    measurementId: "G-C59FD9ZCMV"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+
+  const USERS_BY_PIN = {
+    "adminpin": { name: "Nume Admin", role: "admin" },
+    "prof2025": { name: "Profesor", role: "profesor" },
+    "elev1": { name: "Buzdugan Matei", role: "elev" },
+    "elev2": { name: "Călin Andrei", role: "elev" },
+    "elev3": { name: "Cioineag Cristian", role: "elev" },
+    "elev4": { name: "Cojoc Otilia", role: "elev" },
+    "elev5": { name: "Crețu Daniel", role: "elev" }
+  };
+
+  let questions = [];
+  let selectedQuestionIndex = -1;
+
+  let currentUser = {
+    name: "",
+    role: "guest"
+  };
+
+  function saveCurrentUser() {
+    try {
+      sessionStorage.setItem("ask4cni_user", JSON.stringify(currentUser));
+    } catch (e) {
+      console.log("Nu pot salva userul:", e);
+    }
+  }
+
+  function loadCurrentUser() {
+    try {
+      const data = sessionStorage.getItem("ask4cni_user");
+      if (data) {
+        const u = JSON.parse(data);
+        if (u && u.name && u.role) {
+          currentUser = u;
+        }
+      }
+    } catch (e) {
+      console.log("Nu pot citi userul:", e);
+    }
+  }
+
+  function updateLoginUI() {
+    const loginInfo = document.getElementById("loginInfo");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const loginBtn = document.getElementById("loginBtn");
+    loginBtn.style.position = "relative";
+    loginBtn.style.top = "-7px";
+    logoutBtn.style.position = "relative";
+    logoutBtn.style.top = "-7px";
+    if (currentUser.role !== "guest" && currentUser.name) {
+      loginInfo.textContent = "👤 " + currentUser.name;
+      logoutBtn.style.display = "inline-block";
+      loginBtn.style.display = "none";
+    } else {
+      loginInfo.textContent = "";
+      logoutBtn.style.display = "none";
+      loginBtn.style.display = "inline-block";
+    }
+  }
+
+  window.addEventListener('load', function() {
+  document.documentElement.style.overflow = "hidden";
+  document.body.style.overflow = "hidden";
+  setTimeout(function() {
+    const intro = document.getElementById('introOverlay');
+    if (intro) {
+      intro.classList.add('fade-out');
+    }
+    document.documentElement.style.overflow = "auto";
+    document.body.style.overflow = "auto";
+  }, 3000);
+  });
+
+  window.showReloadAnimation = function() {
+    const reloadAnim = document.getElementById('reloadAnimation');
+    if (reloadAnim) {
+      reloadAnim.classList.add('active');
+      
+      setTimeout(function() {
+        reloadAnim.classList.remove('active');
+      }, 2000);
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', function() {
+    loadCurrentUser();
+    updateLoginUI();
+
+    const loginBtn = document.getElementById("loginBtn");
+    if (loginBtn) {
+      loginBtn.addEventListener("click", function() {
+        const pin = document.getElementById("loginPin").value.trim().toLowerCase();
+        const profName = document.getElementById("loginName").value.trim();
+
+        if (pin === "") {
+          alert("Introdu un PIN.");
+          return;
+        }
+
+        if (pin === "prof2025") {
+          if (profName === "") {
+            alert("Profesorii trebuie să își scrie numele.");
+            return;
+          }
+          currentUser.name = profName;
+          currentUser.role = "profesor";
+        } else {
+          const user = USERS_BY_PIN[pin];
+          if (!user) {
+            alert("PIN invalid.");
+            return;
+          }
+          currentUser.name = user.name;
+          currentUser.role = user.role;
+        }
+
+        document.getElementById("loginPin").value = "";
+        document.getElementById("loginName").value = "";
+
+        saveCurrentUser();
+        updateLoginUI();
+      });
+    }
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    if (logoutBtn) {
+      logoutBtn.addEventListener("click", function() {
+        currentUser.name = "";
+        currentUser.role = "guest";
+        saveCurrentUser();
+        updateLoginUI();
+      });
+    }
+
+    startQuestionsListener();
+
+    const questionForm = document.getElementById("questionForm");
+    if (questionForm) {
+      questionForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        if (currentUser.role === "guest") {
+          alert("Trebuie să fii logat.");
+          return;
+        }
+
+        const title = document.getElementById("qTitle").value.trim();
+        const subject = document.getElementById("qSubject").value.trim();
+        const text = document.getElementById("qBody").value.trim();
+
+        if (title === "" || subject === "" || text === "") {
+          alert("Completează toate câmpurile.");
+          return;
+        }
+
+        const q = {
+          title: title,
+          subject: subject,
+          text: text,
+          author: currentUser.name,
+          answers: [],
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        db.collection("questions").add(q)
+          .then(function() {
+            document.getElementById("qTitle").value = "";
+            document.getElementById("qSubject").value = "";
+            document.getElementById("qBody").value = "";
+          })
+          .catch(function(err) {
+            console.log("Eroare la adăugare întrebare:", err);
+            alert("A apărut o eroare, încearcă din nou.");
+          });
+      });
+    }
+
+    const answerForm = document.getElementById("answerForm");
+    if (answerForm) {
+      answerForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+
+        if (currentUser.role === "guest") {
+          alert("Trebuie să fii logat.");
+          return;
+        }
+
+        if (selectedQuestionIndex < 0 || selectedQuestionIndex >= questions.length) {
+          alert("Alege o întrebare mai întâi.");
+          return;
+        }
+
+        const text = document.getElementById("aBody").value.trim();
+        if (text === "") {
+          alert("Scrie un răspuns.");
+          return;
+        }
+
+        const q = questions[selectedQuestionIndex];
+        if (!q.answers) q.answers = [];
+
+        const ans = {
+          text: text,
+          author: currentUser.name,
+          teacherComment: "",
+          commentAuthor: "",
+          approvedBy: ""
+        };
+
+        q.answers.push(ans);
+        document.getElementById("aBody").value = "";
+
+        db.collection("questions").doc(q.id).update({
+          answers: q.answers
+        }).catch(function(err) {
+          console.log("Eroare la adăugare răspuns:", err);
+        });
+      });
+    }
+  });
+
+  function startQuestionsListener() {
+    db.collection("questions")
+      .orderBy("createdAt", "asc")
+      .onSnapshot(function(snapshot) {
+        questions = [];
+        snapshot.forEach(function(doc) {
+          const data = doc.data();
+          data.id = doc.id;
+          if (!data.answers) data.answers = [];
+          questions.push(data);
+        });
+
+        if (selectedQuestionIndex >= questions.length) {
+          selectedQuestionIndex = questions.length - 1;
+        }
+
+        renderQuestions();
+        renderDetail();
+      });
+  }
+
+  function renderQuestions() {
+    const questionsList = document.getElementById("questionsList");
+    if (!questionsList) return;
+    
+    questionsList.innerHTML = "";
+
+    if (questions.length === 0) {
+      const li = document.createElement("li");
+      li.textContent = "Nu există întrebări încă.";
+      questionsList.appendChild(li);
+      return;
+    }
+
+    for (let i = 0; i < questions.length; i++) {
+      const q = questions[i];
+      const li = document.createElement("li");
+
+      const textSpan = document.createElement("span");
+      textSpan.textContent = q.title + " - " + q.author;
+
+      const subjSpan = document.createElement("span");
+      subjSpan.className = "materia";
+      subjSpan.style.fontWeight = "bold";
+      subjSpan.textContent = q.subject;
+
+      li.appendChild(textSpan);
+      li.appendChild(subjSpan);
+
+      li.setAttribute("data-i", i);
+      li.addEventListener("click", function() {
+        selectedQuestionIndex = parseInt(this.getAttribute("data-i"));
+        renderDetail();
+      });
+
+      questionsList.appendChild(li);
+    }
+  }
+
+  function renderDetail() {
+    const questionDetail = document.getElementById("questionDetail");
+    const answersList = document.getElementById("answersList");
+    
+    if (!questionDetail || !answersList) return;
+    
+    questionDetail.innerHTML = "";
+    answersList.innerHTML = "";
+
+    if (selectedQuestionIndex < 0 || selectedQuestionIndex >= questions.length) {
+      questionDetail.innerHTML = "<p><strong>Choose a question on the left.</strong></p>";
+      return;
+    }
+
+    const q = questions[selectedQuestionIndex];
+
+    const t = document.createElement("p");
+    t.innerHTML = "<strong><u>" + q.title + "</u></strong>";
+    t.style.marginBottom = "20px";  
+    t.style.fontSize = "20px";     
+    questionDetail.appendChild(t);
+
+
+    const s = document.createElement("p");
+    s.textContent = "- Subject: " + q.subject;
+    questionDetail.appendChild(s);
+
+    const tx = document.createElement("p");
+    tx.textContent = "- " + q.text;
+    questionDetail.appendChild(tx);
+
+    const au = document.createElement("p");
+    au.textContent = "- Întrebare pusă de: " + q.author;
+    au.className = "meta";
+    questionDetail.appendChild(au);
+
+    if (currentUser.role === "admin") {
+      const delQBtn = document.createElement("button");
+      delQBtn.textContent = "Șterge întrebarea";
+      delQBtn.className = "deleteBtn";
+      delQBtn.type = "button";
+      delQBtn.style.fontWeight = "bold";
+
+      delQBtn.addEventListener("click", function() {
+        deleteQuestion(selectedQuestionIndex);
+      });
+
+      questionDetail.appendChild(delQBtn);
+    }
+
+    if (q.answers.length === 0) {
+      const p = document.createElement("p");
+      p.innerHTML = "<strong>Nu există răspunsuri încă.</strong>";
+      answersList.appendChild(p);
+    }
+    else {
+      for (let i = 0; i < q.answers.length; i++) {
+        const ans = q.answers[i];
+        const div = document.createElement("div");
+        div.className = "answer";
+
+        const textDiv = document.createElement("div");
+        textDiv.textContent = ans.text;
+        div.appendChild(textDiv);
+
+        const meta = document.createElement("div");
+        meta.className = "meta";
+
+        let metaText = "Răspuns de " + ans.author;
+
+        if (ans.approvedBy) {
+          metaText += " (bifat de " + ans.approvedBy + ")";
+        }
+
+        const strong = document.createElement("strong");
+        strong.textContent = metaText;
+
+        meta.appendChild(strong);
+
+        div.appendChild(meta);
+
+        if (ans.teacherComment) {
+          const comm = document.createElement("div");
+          comm.className = "teacherComment";
+          const autorComm = ans.commentAuthor ? (" (" + ans.commentAuthor + ")") : "";
+          comm.innerHTML = "<strong>Comentariu profesor" + autorComm + ": " + ans.teacherComment + "</strong>";
+          div.appendChild(comm);
+        }
+
+        if (currentUser.role === "profesor" || currentUser.role === "admin") {
+          const btns = document.createElement("div");
+          btns.className = "answerButtons";
+
+          const label = document.createElement("label");
+          label.className = "checkLabel";
+          const check = document.createElement("input");
+          check.type = "checkbox";
+          check.checked = !!ans.approvedBy;
+          check.addEventListener("change", toggleApproval(selectedQuestionIndex, i));
+          label.appendChild(check);
+          const spanText = document.createElement("span");
+          spanText.textContent = " Bifează acest răspuns";
+          label.appendChild(spanText);
+          btns.appendChild(label);
+
+          const cBtn = document.createElement("button");
+          cBtn.type = "button";
+          cBtn.textContent = "Comentariu profesor";
+          cBtn.style.fontWeight = "bold";
+          cBtn.addEventListener("click", setTeacherComment(selectedQuestionIndex, i));
+          btns.appendChild(cBtn);
+
+          if (currentUser.role === "admin") {
+            const delAnsBtn = document.createElement("button");
+            delAnsBtn.type = "button";
+            delAnsBtn.textContent = "Șterge răspuns";
+            delAnsBtn.style.fontWeight = "bold";
+            delAnsBtn.className = "deleteBtn";
+            delAnsBtn.addEventListener("click", deleteAnswer(selectedQuestionIndex, i));
+            btns.appendChild(delAnsBtn);
+          }
+
+          div.appendChild(btns);
+        }
+
+        answersList.appendChild(div);
+      }
+    }
+  }
+
+  function setTeacherComment(qIndex, aIndex) {
+    return function() {
+      if (currentUser.role !== "profesor" && currentUser.role !== "admin") {
+        alert("Doar profesorii sau adminul pot lăsa comentarii.");
+        return;
+      }
+
+      const text = prompt("Scrie comentariul profesorului:");
+      if (text === null) return;
+      const trimmedText = text.trim();
+
+      const q = questions[qIndex];
+      if (!q || !q.answers || !q.answers[aIndex]) return;
+
+      if (trimmedText === "") {
+        q.answers[aIndex].teacherComment = "";
+        q.answers[aIndex].commentAuthor = "";
+      } else {
+        q.answers[aIndex].teacherComment = trimmedText;
+        q.answers[aIndex].commentAuthor = currentUser.name;
+      }
+
+      db.collection("questions").doc(q.id).update({
+        answers: q.answers
+      }).catch(function(err) {
+        console.log("Eroare la salvarea comentariului:", err);
+      });
+    };
+  }
+
+  function toggleApproval(qIndex, aIndex) {
+    return function(event) {
+      if (currentUser.role !== "profesor" && currentUser.role !== "admin") {
+        alert("Doar profesorii sau adminul pot bifa răspunsurile.");
+        event.target.checked = false;
+        return;
+      }
+
+      const q = questions[qIndex];
+      if (!q || !q.answers || !q.answers[aIndex]) return;
+
+      if (event.target.checked) {
+        q.answers[aIndex].approvedBy = currentUser.name;
+      } else {
+        q.answers[aIndex].approvedBy = "";
+      }
+
+      db.collection("questions").doc(q.id).update({
+        answers: q.answers
+      }).catch(function(err) {
+        console.log("Eroare la actualizare bifa:", err);
+      });
+    };
+  }
+
+  function deleteQuestion(index) {
+    const q = questions[index];
+    if (!q) return;
+    if (!confirm("Sigur vrei să ștergi această întrebare?")) return;
+
+    db.collection("questions").doc(q.id).delete()
+      .catch(function(err) {
+        console.log("Eroare la ștergere întrebare:", err);
+      });
+
+    selectedQuestionIndex = -1;
+  }
+
+  function deleteAnswer(qIndex, aIndex) {
+    return function() {
+      if (!confirm("Sigur vrei să ștergi acest răspuns?")) return;
+
+      const q = questions[qIndex];
+      if (!q) return;
+      if (!q.answers) q.answers = [];
+
+      q.answers.splice(aIndex, 1);
+
+      db.collection("questions").doc(q.id).update({
+        answers: q.answers
+      }).catch(function(err) {
+        console.log("Eroare la ștergere răspuns:", err);
+      });
+    };
+  }
+</script>
+
 </body>
 </html>
